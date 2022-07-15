@@ -70,9 +70,9 @@ export default class RemoteRepository implements Repository {
         this.url = url + (url.endsWith("/") ? "" : "/");
     }
 
-    async getResource(id: string, version: string): Promise<ResourceJson | null> {
+    private async getResource(type: string, id: string, version: string): Promise<ResourceJson | null> {
         try {
-            const response = await fetch(this.url + id + "/" + version + "/resource.json");
+            const response = await fetch(`${this.url}${type}/${id}/${version}/resource.json`);
             const json = await response.json() as ResourceJson;
             // Should always be true
             if (json.id == id && json.version == version) {
@@ -85,11 +85,11 @@ export default class RemoteRepository implements Repository {
     }
 
     async resolvePlugin(id: string, version: string): Promise<Plugin | null> {
-        throw new Error("Method not implemented.");
+        return null;
     }
 
     async resolveDependency(id: string, version: string): Promise<Dependency | null> {
-        const resource = await this.getResource(id, version);
+        const resource = await this.getResource("dependency", id, version);
         if (resource != null && resource.type == "dependency") {
             const file = await fetch(this.url + id + "/" + version + "/" + getShortId(id) + "-" + version + ".zip");
             const blob = await file.blob();

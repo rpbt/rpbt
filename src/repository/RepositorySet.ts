@@ -2,6 +2,7 @@ import { localCommunication } from "../index";
 import Dependency from "../dependency/Dependency";
 import Plugin from "../plugin/Plugin";
 import Repository from "./Repository";
+import RemoteRepository from "./RemoteRepository";
 
 interface RepositoryInfo {
     repository: Repository;
@@ -16,7 +17,8 @@ export default class RepositorySet {
 
     constructor() {
         this.repositories = [
-            { repository: localCommunication, name: "local" }
+            { name: "local", repository: localCommunication },
+            { name: "official", repository: new RemoteRepository("https://rpbt.github.io/repo/") }
         ];
     }
 

@@ -8,6 +8,6 @@ services:
       - 4173:4173
     volumes:
       - .:/app
-    command: [ "npm", "run", "preview" ]
+    command: [ "npm", "run", "dev" ]
     tty: true
     stdin_open: true
