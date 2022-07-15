@@ -1,0 +1,14 @@
+{
+    "type": "plugin",
+    "id": "custom-model-data",
+    "version": "1.0",
+    "build": {
+        "main": "main.js"
+    },
+    "standalone_tasks": [
+        {
+            "name": "ModelDB",
+            "main": "modeldb.js"
+        }
+    ]
+}

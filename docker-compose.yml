@@ -1,0 +1,13 @@
+version: '3'
+services:
+  rpbt:
+    image: node:16.15-alpine3.14
+    working_dir: /app
+    ports:
+      - 3000:3000
+      - 4173:4173
+    volumes:
+      - .:/app
+    command: [ "npm", "run", "preview" ]
+    tty: true
+    stdin_open: true

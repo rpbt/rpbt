@@ -1,0 +1,9 @@
+{
+    "type": "plugin",
+    "id": "clean",
+    "version": "1.0",
+    "build": {
+        "main": "clean.js",
+        "order_value": 25
+    }
+}

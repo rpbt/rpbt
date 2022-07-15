@@ -1,0 +1,8 @@
+{
+    "type": "plugin",
+    "id": "include",
+    "version": "1.0",
+    "build": {
+        "main": "include.js"
+    }
+}
