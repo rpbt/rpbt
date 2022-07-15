@@ -1,0 +1,35 @@
+html, body {
+    min-height: 100vh;
+}
+.pack {
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+.installations-dropdown {
+    width: auto;
+    display: inline-block;
+    line-height: 1;
+}
+.log-container {
+    font-family: monospace;
+    font-size: 11px;
+}
+.log-container > div {
+    border-width: 1px 0px;
+    border-style: solid;
+    margin-top: -1px;
+    white-space: pre;
+}
+.log-info {
+    border-color: rgb(240, 240, 240);
+}
+.log-warn {
+    background-color: rgb(255, 255, 230);
+    color: rgb(90, 60, 10);
+    border-color: rgb(255, 245, 200);
+}
+.log-error {
+    background-color: rgb(255, 240, 240);
+    color: rgb(255, 10, 30);
+    border-color: rgb(255, 215, 215);
+}
