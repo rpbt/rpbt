@@ -3,6 +3,7 @@ import Pack from "../pack/Pack";
 import JSZip from "jszip";
 import Logger from "./logger/Logger";
 import Plugin from "./Plugin";
+import { modules } from "../modules";
 
 export default class ImportResolver {
     /**
@@ -40,16 +41,15 @@ export default class ImportResolver {
             };
         }
 
-        switch (path) {
-            case "@rpbt/pack/Pack": return Pack;
-        }
-        
         if (path.startsWith("@rpbt/")) {
-            // TODO This will not work for production builds
-            const jsFile = "/src/" + path.substring("@rpbt/".length) + ".ts";
-            const res = await import(/* @vite-ignore */ jsFile).catch(_ignored => { });
-            if (res != null) {
-                return res;
+            const file = "./" + path.substring("@rpbt/".length) + ".ts";
+            const moduleGetter = modules[file];
+            if (moduleGetter != null) {
+                const promise = moduleGetter();
+                const res = await promise.catch(_ignored => { });
+                if (res != null) {
+                    return res;
+                }
             }
         }
 
