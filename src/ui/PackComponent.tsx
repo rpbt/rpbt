@@ -54,8 +54,8 @@ export default class PackComponent extends React.Component<PackComponentProps, P
                                 <span>Install into </span>
                                 {this.state.installations && (
                                     <select ref={this.inputRef} className="form-select installations-dropdown">
-                                        {this.state.installations.map(installation => {
-                                            return <option>{installation}</option>
+                                        {this.state.installations.map((installation, index) => {
+                                            return <option key={index}>{installation}</option>
                                         })}
                                     </select>
                                 )}

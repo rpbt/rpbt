@@ -22,7 +22,7 @@ export default class StandaloneTasks extends React.Component<StandaloneTasksProp
                 <select className="form-control" onChange={e => this.setState({ selected: this.props.tasks[parseInt(e.target.value)] })}>
                     <option value="-1">None selected</option>
                     {this.props.tasks.map((task, index) => {
-                        return <option value={index}>{task.getName()}</option>
+                        return <option value={index} key={index}>{task.getName()}</option>
                     })}
                 </select>
                 {this.state.selected != null && (
