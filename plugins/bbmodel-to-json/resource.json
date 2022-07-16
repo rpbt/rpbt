@@ -1,0 +1,6 @@
+{
+    "type": "plugin",
+    "id": "bbmodel-to-json",
+    "version": "0.1",
+    "exports": "main.js"
+}

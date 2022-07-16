@@ -1,10 +1,17 @@
-import Pack from "../../pack/Pack";
-import Logger from "../logger/Logger";
+///<reference path="../../rpbt-types.d.ts" />
 
-const logger = new Logger("bbmodel-to-json");
+import Pack from "@rpbt/pack/Pack";
 
-// TODO: Is this a plugin?
-export async function convertBbmodelToJson(target: Pack, bbModelJson: any): Promise<any> {
+// note: experimental!
+
+/**
+ * Convert a .bbmodel file into a model.
+ * 
+ * @param {Pack} target The target pack
+ * @param {any} bbModelJson The .bbmodel json
+ * @returns A promise that resolves with the model json.
+ */
+export async function convertBbmodelToJson(target, bbModelJson) {
     if (!(bbModelJson.meta && bbModelJson.meta.format_version == "4.0")) {
         throw new Error(
             "Unsupported .bbmodel format. Only version 4.0 is currently supported." +
@@ -12,9 +19,7 @@ export async function convertBbmodelToJson(target: Pack, bbModelJson: any): Prom
         );
     }
 
-    target.addLogger(logger);
-
-    const json: any = {
+    const json = {
         credit: "Made with Blockbench",
         elements: [],
         textures: {}
@@ -65,7 +70,7 @@ export async function convertBbmodelToJson(target: Pack, bbModelJson: any): Prom
 
             const base64 = bbTexture.source;
 
-            const image = await new Promise<HTMLImageElement>(function (resolve, reject) {
+            const image = await new Promise(function (resolve, reject) {
                 const image = new Image();
                 image.onload = function () {
                     resolve(image);
@@ -77,7 +82,7 @@ export async function convertBbmodelToJson(target: Pack, bbModelJson: any): Prom
             const canvas = document.createElement("canvas");
             canvas.width = image.width;
             canvas.height = image.height;
-            const ctx = canvas.getContext("2d")!;
+            const ctx = canvas.getContext("2d");
             ctx.drawImage(image, 0, 0);
 
             const file = target.getFile(path);
@@ -90,7 +95,7 @@ export async function convertBbmodelToJson(target: Pack, bbModelJson: any): Prom
                 const canvas2 = document.createElement("canvas");
                 canvas2.width = image2.width;
                 canvas2.height = image2.height;
-                const ctx2 = canvas2.getContext("2d")!;
+                const ctx2 = canvas2.getContext("2d");
                 ctx2.drawImage(image2, 0, 0);
 
                 if (canvas.width != canvas2.width || canvas.height == canvas2.height) {
@@ -126,7 +131,7 @@ export async function convertBbmodelToJson(target: Pack, bbModelJson: any): Prom
     }
 
     for (const bbElement of bbModelJson.elements) {
-        const element: any = {
+        const element = {
             from: bbElement.from,
             to: bbElement.to,
             faces: {}
@@ -134,7 +139,7 @@ export async function convertBbmodelToJson(target: Pack, bbModelJson: any): Prom
 
         for (const faceName in bbElement.faces) {
             const bbFace = bbElement.faces[faceName];
-            const face: any = {
+            const face = {
                 uv: bbFace.uv
             };
             const texture = bbModelJson.textures[bbFace.texture];
