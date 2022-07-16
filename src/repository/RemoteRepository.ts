@@ -70,13 +70,17 @@ export default class RemoteRepository implements Repository {
         this.url = url + (url.endsWith("/") ? "" : "/");
     }
 
-    private async getResource(type: string, id: string, version: string): Promise<ResourceJson | null> {
+    private async getFiles(type: ResourceType, id: string, version: string): Promise<[ResourceJson, Blob] | null> {
         try {
-            const response = await fetch(`${this.url}${type}/${id}/${version}/resource.json`);
-            const json = await response.json() as ResourceJson;
+            // Fetch the resource.json
+            const resourceResponse = await fetch(`${this.url}${type}/${id}/${version}/resource.json`);
+            const json = await resourceResponse.json() as ResourceJson;
             // Should always be true
-            if (json.id == id && json.version == version) {
-                return json;
+            if (json.id == id && json.version == version && json.type == type) {
+                // Fetch the zip
+                const zipResponse = await fetch(`${this.url}${type}/${id}/${version}/${getShortId(id)}-${version}.zip`);
+                const zip = await zipResponse.blob();
+                return [json, zip];
             }
             return null;
         } catch {
@@ -85,21 +89,23 @@ export default class RemoteRepository implements Repository {
     }
 
     async resolvePlugin(id: string, version: string): Promise<Plugin | null> {
+        const res = await this.getFiles("plugin", id, version);
+        if (res) {
+            const [json, zip] = res;
+            return Plugin.loadZipFile(json, zip);
+        }
         return null;
     }
 
     async resolveDependency(id: string, version: string): Promise<Dependency | null> {
-        const resource = await this.getResource("dependency", id, version);
-        if (resource != null && resource.type == "dependency") {
-            const file = await fetch(this.url + id + "/" + version + "/" + getShortId(id) + "-" + version + ".zip");
-            const blob = await file.blob();
-            const blobFile = new File([blob], id + ":" + version);
-            const pack = await Pack.loadZipFile(blobFile, PackType.DEPENDENCY);
-            
+        const res = await this.getFiles("dependency", id, version);
+        if (res) {
+            const [_json, blob] = res;
+            const file = new File([blob], id + ":" + version);
+            const pack = await Pack.loadZipFile(file, PackType.DEPENDENCY);
+
             return new Dependency(id, version, pack);
         }
         return null;
     }
 }
-// @ts-ignore
-window["RemoteRepository"] = RemoteRepository;

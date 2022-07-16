@@ -198,10 +198,13 @@ export default class Pack implements FolderOrRoot {
                 let plugin: Plugin | null = null;
                 if (pluginInfo.id.startsWith("./")) {
                     // A script plugin
+                    if (!pluginInfo.version) {
+                        pluginInfo.version = this.buildSystemInfo.version;
+                    }
                     try {
                         plugin = await Plugin.loadJSZip({
                             id: pluginInfo.id,
-                            version: pluginInfo.version || "",
+                            version: pluginInfo.version,
                             type: "plugin",
                             build: {
                                 main: pluginInfo.id.substring(2)
