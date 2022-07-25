@@ -1,4 +1,4 @@
-import { ResourceJson } from "../repository/RemoteRepository";
+import { ResourceJson } from "../repository/resource";
 
 export default interface OutputInfo {
     /** The name of the file the user downloads. */

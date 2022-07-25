@@ -1,16 +1,15 @@
 import OutputInfo from "../build/OutputInfo";
 import Pack from "../pack/Pack";
-import BuildTask from "./BuildTask";
+import InternalBuildTask from "./InternalBuildTask";
 
 /**
  * A task ran early in the building process that removes the resource-pack-build-tool
  * information from the pack meta and renames it back to pack.mcmeta in case it was
  * named differently.
  */
-export default class BuildToolInfoTask extends BuildTask {
+export default class BuildToolInfoTask extends InternalBuildTask {
     constructor() {
-        // @ts-ignore // todo
-        super(null, 5);
+        super("build-tool-info", 5);
     }
 
     async run(source: Pack, target: Pack, outputInfo: OutputInfo): Promise<void> {

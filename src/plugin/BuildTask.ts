@@ -8,7 +8,7 @@ import Plugin from "./Plugin";
  * A task ran when building a pack.
  */
 export default class BuildTask {
-    private readonly fileExecutor: FileExecutor;
+    private readonly fileExecutor: FileExecutor | null;
     orderValue: number;
     plugin: Plugin | null = null;
 
@@ -21,13 +21,16 @@ export default class BuildTask {
      * @param fileExecutor The file executor that runs this build task.
      * @param orderValue The order value.
      */
-    constructor(fileExecutor: FileExecutor, orderValue = 15) {
+    constructor(fileExecutor: FileExecutor | null, orderValue = 15) {
         this.fileExecutor = fileExecutor;
         this.orderValue = orderValue;
     }
 
     getLogger(): Logger {
-        return this.plugin!.logger;
+        if (!this.plugin) {
+            throw new Error("Unable to get the logger for build task, no plugin was set.");
+        }
+        return this.plugin.logger;
     }
 
     /**
@@ -38,6 +41,9 @@ export default class BuildTask {
      * @param outputInfo Information about the produced output.
      */
     async run(source: Pack, target: Pack, outputInfo: OutputInfo): Promise<void> {
+        if (!this.fileExecutor) {
+            throw new Error("Build task had no FileExecutor.");
+        }
         const importResolver = this.fileExecutor.importResolver;
         importResolver.sourcePack = source;
         importResolver.targetPack = target;

@@ -1,5 +1,5 @@
 import { PluginInfo } from "../pack/BuildSystemInfo";
-import { PluginResourceJson } from "../repository/RemoteRepository";
+import { PluginResourceJson } from "../repository/resource";
 import BuildTask from "./BuildTask";
 import StandaloneTask from "./StandaloneTask";
 import JSZip from "jszip";

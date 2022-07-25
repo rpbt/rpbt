@@ -7,7 +7,7 @@ import { download, getShortId } from "../util/utils";
 import OutputInfo from "./OutputInfo";
 import Logger from "../plugin/logger/Logger";
 import StandaloneTask from "../plugin/StandaloneTask";
-import DeferredLogContainer from "../plugin/logger/DeferredLogContainer";
+import CryptoJS from "crypto-js";
 
 /**
  * Created when a pack is being built and holds data needed for the build.
@@ -15,9 +15,10 @@ import DeferredLogContainer from "../plugin/logger/DeferredLogContainer";
 export default class BuildProcess {
     readonly sourcePack: Pack;
     readonly targetPack: Pack;
-    readonly tasks: BuildTask[];
     readonly outputInfo: OutputInfo;
     readonly logger: Logger;
+    readonly tasks: BuildTask[];
+    private blob?: Blob;
 
     static async create(sourcePack: Pack): Promise<BuildProcess> {
         const logger = new Logger(sourcePack.name);
@@ -80,15 +81,19 @@ export default class BuildProcess {
                 task.getLogger().error(e);
             }
         }
+        this.blob = await this.targetPack.getZip().generateAsync({ type: "blob" });
+        await this.computeSha1();
     }
 
-    private getTargetPackBlob(): Promise<Blob> {
-        return this.targetPack.getZip().generateAsync({ type: "blob" });
+    private getBlob() {
+        if (!this.blob) {
+            throw new Error("The pack has not been built yet.");
+        }
+        return this.blob;
     }
 
-    async downloadOutputPack() {
-        const blob = await this.getTargetPackBlob();
-        download(blob, this.outputInfo.fileName);
+    downloadOutputPack() {
+        download(this.getBlob(), this.outputInfo.fileName);
     }
 
     async downloadResource() {
@@ -96,7 +101,7 @@ export default class BuildProcess {
         const { id, version } = this.outputInfo.resourceJson;
         const folder = zip.folder(id + "/" + version)!;
         folder.file("resource.json", JSON.stringify(this.outputInfo.resourceJson, null, 4));
-        folder.file(getShortId(id) + "-" + version + ".zip", await this.getTargetPackBlob());
+        folder.file(getShortId(id) + "-" + version + ".zip", this.getBlob());
         const blob = await zip.generateAsync({ type: "blob" });
         download(blob, id + "-" + version + "-resource.zip");
     }
@@ -104,14 +109,30 @@ export default class BuildProcess {
     async saveToLocalRepo() {
         const { id, version } = this.outputInfo.resourceJson;
         const resourceJson = JSON.stringify(this.outputInfo.resourceJson, null, 4);
-        const resourceFile = await this.getTargetPackBlob();
+        const resourceFile = this.getBlob();
 
         await localCommunication.saveToLocalRepo(id, version, resourceJson, resourceFile);
     }
 
     async installPackInGame(installation: string) {
-        const file = await this.getTargetPackBlob();
-
+        const file = this.getBlob();
         await localCommunication.installPackInGame(installation, file, this.outputInfo.fileName);
+    }
+
+    private async computeSha1() {
+        const blob = this.getBlob();
+        const arraybuffer = await new Promise<ArrayBuffer>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = e => resolve(reader.result as ArrayBuffer);
+            reader.onerror = e => reject(reader.error);
+            reader.readAsArrayBuffer(blob);
+        });
+        // @ts-ignore
+        const wordarray = CryptoJS.lib.WordArray.create(arraybuffer);
+        const hash = CryptoJS.SHA1(wordarray);
+        const string = hash.toString(CryptoJS.enc.Hex);
+        this.outputInfo.resourceJson.hash = {
+            sha1: string
+        };
     }
 }

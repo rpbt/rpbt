@@ -9,12 +9,14 @@
     "make-types": "node scripts/make-types.js"
   },
   "dependencies": {
+    "crypto-js": "^4.1.1",
     "jszip": "^3.10.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "sweetalert2": "^11.3.0"
   },
   "devDependencies": {
+    "@types/crypto-js": "^4.1.1",
     "@types/react": "^18.0.15",
     "@types/react-dom": "^18.0.6",
     "@vitejs/plugin-react": "^2.0.0",
