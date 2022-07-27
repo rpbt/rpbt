@@ -19,6 +19,16 @@ const MIME_TYPES = {
 let root;
 
 const server = http.createServer(async function(req, res) {
+    res.setHeader("Access-Control-Allow-Origin", "https://rpbt.github.io");
+    res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
+    if (req.method == "OPTIONS") {
+        res.statusCode = 200;
+        res.end();
+        return;
+    }
+
     const url = new URL(req.url, "http://localhost");
     if (url.pathname == "/") url.pathname = "index.html";
     if (url.href.includes("..")) {
